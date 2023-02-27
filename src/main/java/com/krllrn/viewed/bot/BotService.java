@@ -9,6 +9,8 @@ public interface BotService {
     SendMessage deleteFilm(long chatId, String username, String film);
     SendMessage lastN(long chatId, String number);
     SendMessage deleteAll(long chatId, String username);
+    SendMessage stop(long chatId, String username);
     SendMessage help(long chatId, String username);
     SendMessage wrongMessage(long chatId);
+    SendMessage statistic(long chatId);
 }

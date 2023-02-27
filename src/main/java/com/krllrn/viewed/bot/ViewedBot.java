@@ -112,10 +112,26 @@ public class ViewedBot extends TelegramLongPollingBot {
                         log.error(e.getMessage());
                     }
                     break;
+                case "/stop":
+                    try {
+                        execute(botService.stop(chatId, username));
+                        log.info("Reply sent to /stop. User: " + username);
+                    } catch (TelegramApiException e) {
+                        log.error(e.getMessage());
+                    }
+                    break;
                 case "/help":
                     try {
                         execute(botService.help(chatId, username));
                         log.info("Reply sent to /help. User: " + username);
+                    } catch (TelegramApiException e) {
+                        log.error(e.getMessage());
+                    }
+                    break;
+                case "/statistic":
+                    try {
+                        execute(botService.statistic(chatId));
+                        log.info("Reply sent to /stat.");
                     } catch (TelegramApiException e) {
                         log.error(e.getMessage());
                     }

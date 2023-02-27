@@ -19,6 +19,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -86,7 +88,7 @@ public class BotServiceImpl implements BotService {
                 UserFilm userFilm = new UserFilm();
                 userFilm.setFilm(film);
                 userFilm.setUser(usersRepository.findByChatId(chatId));
-                userFilm.setAddDate(LocalDate.now());
+                userFilm.setAddDate(LocalDateTime.now());
 
                 userFilmsRepository.save(userFilm);
                 log.info("Save film: " + film.getNameRu() + " to user: " + username);
@@ -174,6 +176,7 @@ public class BotServiceImpl implements BotService {
         return sendMessage;
     }
 
+
     @Override
     public SendMessage help(long chatId, String username) {
         SendMessage sendMessage = new SendMessage();
@@ -186,7 +189,21 @@ public class BotServiceImpl implements BotService {
                 "\n"
                 + "/delete {Название} " + "- удаление из просмотренного;" + "\n"
                 + "/clear " + "- очистить полностью просмотренное;" + "\n"
-                + "/help " + "- вывод данной справки." + "\n");
+                + "/help " + "- вывод данной справки;" + "\n"
+                + "/stop " + "- удалить регистрацию с удалением записей в фильмотеке." + "\n");
+
+        return sendMessage;
+    }
+
+    @Override
+    public SendMessage stop(long chatId, String username) {
+        SendMessage sendMessage = new SendMessage();
+        usersRepository.delete(usersRepository.findByChatId(chatId));
+        log.info("Delete user " + username + " from USERS");
+        userFilmsRepository.deleteAll(userFilmsRepository.findAllByChatId(chatId));
+        log.info("Delete records from USER_FILMS with chatId: " + chatId);
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(username + ", ты удален из базы пользователей. База просмотров также очищена.");
 
         return sendMessage;
     }
@@ -195,7 +212,28 @@ public class BotServiceImpl implements BotService {
     public SendMessage wrongMessage(long chatId) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        sendMessage.setText("Из нас двоих кто-то что-то сделал не так. Да поможет нам /help !");
+        sendMessage.setText("Из нас двоих кто-то что-то сделал не так. \nДа поможет нам /help !");
+
+        return sendMessage;
+    }
+
+    @Override
+    public SendMessage statistic(long chatId) {
+        long usersCount = usersRepository.count();
+        long filmsCount = filmsRepository.count();
+        String lastUpdate;
+        UserFilm userFilm = userFilmsRepository.findFirstByOrderByAddDateDesc();
+        if (userFilm == null) {
+            lastUpdate = "0";
+        } else {
+            lastUpdate = userFilm.getAddDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
+        }
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Статистика на " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")) + ":\n" +
+                "Количество пользователей: " + usersCount + "\n" +
+                "Записей в фильмотеке: " + filmsCount + "\n" +
+                "Последнее обновление: " + lastUpdate);
 
         return sendMessage;
     }
