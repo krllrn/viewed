@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -28,5 +29,5 @@ public class UserFilm {
     private Film film;
 
     @Column(name = "add_date")
-    private LocalDate addDate;
+    private LocalDateTime addDate;
 }
