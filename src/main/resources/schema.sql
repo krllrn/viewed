@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS films, users, user_films;
-
 CREATE TABLE IF NOT EXISTS films (
     film_id BIGINT,
     name_ru VARCHAR(128),
