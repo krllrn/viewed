@@ -18,7 +18,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -51,8 +50,11 @@ public class BotServiceImpl implements BotService {
 
     private final RestTemplate restTemplate;
 
-    public BotServiceImpl(UsersRepository usersRepository, RestTemplate restTemplate) {
+    public BotServiceImpl(UsersRepository usersRepository, FilmsRepository filmsRepository, UserFilmsRepository userFilmsRepository, FilmMapper filmMapper, RestTemplate restTemplate) {
         this.usersRepository = usersRepository;
+        this.filmsRepository = filmsRepository;
+        this.userFilmsRepository = userFilmsRepository;
+        this.filmMapper = filmMapper;
         this.restTemplate = restTemplate;
     }
 
@@ -83,7 +85,8 @@ public class BotServiceImpl implements BotService {
                 sendMessage.setChatId(chatId);
                 sendMessage.setText(username + "! В твоей фильмотеке уже есть: \n"
                         + "Название: " + film.getNameRu() + "\n"
-                        + "Ссылка: " + film.getFilmUrl() + "\n");
+                        + "Ссылка: " + film.getFilmUrl() + "\n"
+                        + "Рейтинг: " + film.getRating() + "\n");
             } else {
                 UserFilm userFilm = new UserFilm();
                 userFilm.setFilm(film);
@@ -95,7 +98,8 @@ public class BotServiceImpl implements BotService {
                 sendMessage.setChatId(chatId);
                 sendMessage.setText("Поздравляю, " + username + "! Фильмотека пополнилась: \n"
                         + "Название: " + film.getNameRu() + "\n"
-                        + "Ссылка: " + film.getFilmUrl() + "\n");
+                        + "Ссылка: " + film.getFilmUrl() + "\n"
+                        + "Рейтинг: " + film.getRating() + "\n");
             }
         }
 
@@ -110,7 +114,8 @@ public class BotServiceImpl implements BotService {
             sendMessage.setChatId(chatId);
             sendMessage.setText("В фильмотеке найден: \n"
                     + "Название: " + film.getNameRu() + "\n"
-                    + "Ссылка: " + film.getFilmUrl() + "\n");
+                    + "Ссылка: " + film.getFilmUrl() + "\n"
+                    + "Рейтинг: " + film.getRating() + "\n");
         } else {
             sendMessage.setChatId(chatId);
             sendMessage.setText("В фильмотеке ничего не найдено :( \nНе скоротать ли вечер за просмотром " + filmName +
